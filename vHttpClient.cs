@@ -9,57 +9,36 @@ namespace ClassLibrary
 {
     public class vHttpClient
     {
-        private static readonly HttpClient _client;
-        //private static readonly HttpRequestMessage _requestMessage;
+        private HttpClient _client;
+        private readonly string _token;
+        private readonly string _userAgent;
 
-        static vHttpClient()
+        vHttpClient(Uri BaseUrl, string token, string userAgent)
         {
             _client = new HttpClient();
+            _client.BaseAddress = BaseUrl;  //https://api.keys.so/
+            _token = token;
+            _userAgent = userAgent;
             //_requestMessage = new HttpRequestMessage();
         }
 
-        public async static Task<string> GET(string Uri)
-        {
-            var requestMessage = new HttpRequestMessage();
 
+
+
+        public async Task<string> GETAsync(string Uri)
+        {
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get, $"{_client.BaseAddress.ToString() + Uri}");
 
             try
             {
-                requestMessage.RequestUri = new Uri(Uri);
-                requestMessage.Method = HttpMethod.Get;
-
                 var response = await _client.SendAsync(requestMessage);
 
-                if (response.StatusCode == System.Net.HttpStatusCode.OK)
-                {
-                    //Console.WriteLine("Успешный запрос ");
-                }
-                else if(response.StatusCode == System.Net.HttpStatusCode.Accepted)
-                {
-                    //Console.WriteLine("Запрос был принят на обработку, но он не завершен. Повторите запрос позже ");
-
-                }
-                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                {
-                    //Console.WriteLine("Ошибка авторизации");
-
-                }
-                else if(response.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
-                {
-                    //Console.WriteLine(" 	Исчерпан лимит запросов по текущему тарифному плану. Подробное описание ошибки доступно в поле message.
-                    //В заголовке Retry - After ответа сервера указанно время(в секундах), через которое клиенту рекомендуется повторить запрос. ");
-                }
-                else if(response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
-                {
-                    //Console.WriteLine("Внутренняя ошибка сервера. Подробное описание ошибки доступно в поле message");
-                }
                 HttpContent content = response.Content;
                 var inf = content.ReadAsStreamAsync().ToString();
                 return inf;
             }
             catch (Exception ex)
             {
-
                 Console.WriteLine("Ошибка: " + ex.Message);
             }
             finally
@@ -68,13 +47,10 @@ namespace ClassLibrary
             }
 
             return null;
-
         }
 
-        public static async Task<string> POST(string Uri, string content)
+        public async Task<string> POSTAsync(string Uri, string content)
         {
-
-
             HttpContent Content = new StringContent(content); 
             try
             {
@@ -96,6 +72,31 @@ namespace ClassLibrary
                 _client.Dispose();
             }
             return null;
+        }
+
+        public HttpStatusCode StatusHandler(HttpResponseMessage response)
+        {
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                Console.WriteLine("Успешный запрос " + "\n");
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Accepted)
+            {
+                Console.WriteLine("Запрос был принят на обработку, но он не завершен. Повторите запрос позже " + "\n");
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                Console.WriteLine("Ошибка авторизации" + "\n");
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
+            {
+                Console.WriteLine("Исчерпан лимит запросов по текущему тарифному плану. Подробное описание ошибки доступно в поле message.В заголовке Retry - After ответа сервера указанно время(в секундах), через которое клиенту рекомендуется повторить запрос. " + "\n");
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
+            {
+                Console.WriteLine("Внутренняя ошибка сервера. Подробное описание ошибки доступно в поле message" + "\n");
+            }
+            return response.StatusCode;
         }
     }
 }
