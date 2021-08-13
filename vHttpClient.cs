@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -10,24 +11,23 @@ namespace ClassLibrary
     public class vHttpClient
     {
         private HttpClient _client;
+        private IEnumerable<string> contents;
         private readonly string _token;
-        private readonly string _userAgent;
+        private const string BaseUrl = "https://api.keys.so/";
+        private readonly string _userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:83.0) Gecko/20100101 Firefox/83.0 ";
+        private static readonly object SyncObj = new object();
 
-        vHttpClient(Uri BaseUrl, string token, string userAgent)
+
+        vHttpClient(string token)
         {
             _client = new HttpClient();
-            _client.BaseAddress = BaseUrl;  //https://api.keys.so/
             _token = token;
-            _userAgent = userAgent;
-            //_requestMessage = new HttpRequestMessage();
         }
-
-
-
 
         public async Task<string> GETAsync(string Uri)
         {
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, $"{_client.BaseAddress.ToString() + Uri}");
+            string error = string.Empty;
 
             try
             {
@@ -39,11 +39,11 @@ namespace ClassLibrary
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Ошибка: " + ex.Message);
-            }
-            finally
-            {
-                _client.Dispose();
+                lock(SyncObj)
+                {
+                    error = $"Сообщение: Пользовательское сообщение: ошибка GETasync; Ошибка: {ex.Message}";
+                    File.AppendAllLines(error, contents, Encoding.UTF8);
+                }
             }
 
             return null;
@@ -51,7 +51,9 @@ namespace ClassLibrary
 
         public async Task<string> POSTAsync(string Uri, string content)
         {
-            HttpContent Content = new StringContent(content); 
+            HttpContent Content = new StringContent(content);
+            string error = string.Empty;
+
             try
             {
                 var requestMessage = new HttpRequestMessage();
@@ -65,38 +67,37 @@ namespace ClassLibrary
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Ошибка: " + ex.Message);
-            }
-            finally
-            {
-                _client.Dispose();
+                lock (SyncObj)
+                {
+                    error = $"Сообщение: Пользовательское сообщение: ошибка GETasync; Ошибка: {ex.Message}";
+                    File.AppendAllLines(error, contents, Encoding.UTF8);
+                }
             }
             return null;
         }
 
         public HttpStatusCode StatusHandler(HttpResponseMessage response)
         {
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            switch(response.StatusCode)
             {
-                Console.WriteLine("Успешный запрос " + "\n");
+                case HttpStatusCode.OK:
+                    break;
+                case HttpStatusCode.Accepted:
+                    break;
+                case HttpStatusCode.Unauthorized:
+                    break;
+                case HttpStatusCode.TooManyRequests:
+                    break;
+                case HttpStatusCode.InternalServerError:
+                    break;
             }
-            else if (response.StatusCode == System.Net.HttpStatusCode.Accepted)
-            {
-                Console.WriteLine("Запрос был принят на обработку, но он не завершен. Повторите запрос позже " + "\n");
-            }
-            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-            {
-                Console.WriteLine("Ошибка авторизации" + "\n");
-            }
-            else if (response.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
-            {
-                Console.WriteLine("Исчерпан лимит запросов по текущему тарифному плану. Подробное описание ошибки доступно в поле message.В заголовке Retry - After ответа сервера указанно время(в секундах), через которое клиенту рекомендуется повторить запрос. " + "\n");
-            }
-            else if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
-            {
-                Console.WriteLine("Внутренняя ошибка сервера. Подробное описание ошибки доступно в поле message" + "\n");
-            }
+
             return response.StatusCode;
+        }
+
+        ~vHttpClient()
+        {
+            _client.Dispose();
         }
     }
 }
