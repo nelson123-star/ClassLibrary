@@ -81,6 +81,7 @@ namespace ClassLibrary.KeysSoModel
 
         [JsonProperty("links")]
         public List<string> Links { get; set; }
+
     }
 
     public class Pr

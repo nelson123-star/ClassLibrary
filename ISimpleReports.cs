@@ -39,17 +39,18 @@ namespace ClassLibrary
 
     public class SimpleReports : ISimpleReports, IDashboard, IContext, IOrganic, ISimilarkeys, IOwner
     {
-        string token = string.Empty;
         private const string baseUrl = "report/simple/";
+        private readonly vHttpClient client;
 
-        public SimpleReports()
+        public SimpleReports(string token)
         {
-            vHttpClient client = new vHttpClient(token);
+            this.client = new vHttpClient(token);
         }
 
         public async Task<string> Dashboard(string @base, string domain)
         {
-            return baseUrl + "domain_dashboard" + "?base=" + @base + "&domain=" + domain;
+           string url = baseUrl + "domain_dashboard" + "?base=" + @base + "&domain=" + domain;
+            return await client.GETAsync(url);
         }
         public async Task<string> DashboardKey(string @base, string keyword)
         {
