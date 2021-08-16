@@ -55,79 +55,62 @@ namespace ClassLibrary
         }
         public async Task<string> DashboardKey(string @base, string keyword)
         {
-            string get = "report/simple/domain_dashboard";
-            string request;
+            string get = "domain_dashboard";
 
-            request = get + "?base=" + @base + "&domain=" + keyword;
-            return request;
+            return streamGet + get + "?base=" + @base + "&domain=" + keyword;
         }
         
         public async Task<string> KeyWordObyavlenia(string @base, string domain, int ads_id)   //?????????????????????
         {
-            string get = "report/simple/context/keywords/byads";
-            string request;
+            string get = "context/keywords/byads";
 
-            request = get + "?base=" + @base + "&domain=" + domain;
-            return request;
+            return streamGet + get + "?base=" + @base + "&domain=" + domain;
         }
         public async Task<string> Advertisement(string @base, string domain, bool full)
         {
             string get = "report/simple/context/ads";
-            string request;
 
-            request = get + "?base=" + @base + "&domain=" + domain;
-            return request;
+            return streamGet + get + "?base=" + @base + "&domain=" + domain;
         }
         public async Task<string> UFact(string @base, string domain)
         {
             string get = "report/simple/context/ads/facts";
-            string request;
 
-            request = get + "?base=" + @base + "&domain=" + domain;
-            return request;
+            return streamGet + get + "?base=" + @base + "&domain=" + domain;
         }
         public async Task<string> ULink(string @base, string domain)
         {
             string get = "report/simple/context/ads/links";
-            string request;
 
-            request = get + "?base=" + @base + "&domain=" + domain;
-            return request;
+            return streamGet + get + "?base=" + @base + "&domain=" + domain;
         }
 
         public async Task<string> SitePage(string @base, string domain)
         {
             string get = "report/simple/organic/sitepages";
-            string request;
 
-            request = get + "?base=" + @base + "&domain=" + domain;
-            return request;
+            return streamGet + get + "?base=" + @base + "&domain=" + domain;
         }
         public async Task<string> KeyWordPage(string @base, string domain, string page_url)
         {
             string get = "report/simple/organic/keywords/bypage?";
-            string request;
 
-            request = get + "?base=" + @base + "&domain=" + domain + "&page_url=" + page_url;
-            return request;
+            return streamGet + get + "?base=" + @base + "&domain=" + domain + "&page_url=" + page_url;
         }
         public async Task<string> PageConcurents(string @base, string domain, string page_url)
         {
             string get = "report/simple/organic/concurent_pages";
-            string request;
 
-            request = get + "?base=" + @base + "&domain=" + "&page_url=" + page_url;
-            return request;
+            return streamGet + get + "?base=" + @base + "&domain=" + "&page_url=" + page_url;
         }
 
         public async Task<string> KeyWord(string context, string @base, string domain)
         {
             if (context == "context" || context == "organic")
             {
-                string get = "report/simple/" + context + "/keywords";
+                string get = streamGet + context + "/keywords";
 
-                string request = get + "?base=" + @base + "&domain=" + domain;
-                return request;
+                return get + "?base=" + @base + "&domain=" + domain; 
             }
             else
             {
@@ -136,37 +119,23 @@ namespace ClassLibrary
         }
         public async Task<string> Concurents(string @base, string domain)
         {
-            string get = "report/simple/organic/concurents";
-            string request;
+            string get = "organic/concurents";
 
-            request = get + "?base=" + @base + "&domain=" + domain;
-            return request;
+            return streamGet + get + "?base=" + @base + "&domain=" + domain;;
         }
 
         public async Task<string> Owner(string id, string mode)
         {
             string get = "report/owner/";
-            string request;
 
-            //Dictionary<int, string> Mode = new Dictionary<int, string>
-            //{
-            //    {1, "analystics" },
-            //    {2, "adsense" },
-            //    {3, "leadia" },
-            //    {4, "relapio" },
-            //    {5, "subdomains" }
-            //};
-            request = get + mode + "?id=" + id;
-            return request;
+            return get + mode + "?id=" + id;
 
         }
         public async Task<string> Similarkeys(string @base, string keyword)
         {
-            string get = "report/simple/similarkeys";
-            string request;
+            string get = "similarkeys";
 
-            request = get + "?base=" + @base + "&domain=" + keyword;
-            return request;
+            return  streamGet + get + "?base=" + @base + "&domain=" + keyword;;
         }
 
 
