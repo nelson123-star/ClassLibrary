@@ -43,15 +43,15 @@ namespace ClassLibrary
                 Console.WriteLine(response.ToString());
 
 
-                using (FileStream fs = new FileStream("Post.json", FileMode.OpenOrCreate))
-                {
-                    using (StreamWriter writer = new StreamWriter(@"C:\Users\user\source\repos\ConsoleAppHTTP\bin\Debug\net5.0\Post.json"))
-                    {
-                        JsonConvert.SerializeObject(content);
-                        Console.WriteLine("Сериализация выполенена");
+                //using (FileStream fs = new FileStream("Post.json", FileMode.OpenOrCreate))
+                //{
+                //    using (StreamWriter writer = new StreamWriter(@"C:\Users\user\source\repos\ConsoleAppHTTP\bin\Debug\net5.0\Post.json"))
+                //    {
+                //        JsonConvert.SerializeObject(content);
+                //        Console.WriteLine("Сериализация выполенена");
 
-                    }
-                }
+                //    }
+                //}
                 return content.ToString();
             }
             catch (Exception ex)
