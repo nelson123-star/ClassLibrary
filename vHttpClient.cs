@@ -16,7 +16,7 @@ namespace ClassLibrary
         private HttpClient _client;
         private IEnumerable<string> contents;
         private readonly string _token;
-        private const string BaseUrl = "https://api.keys.so/X-Keyso-TOKEN:";
+        private const string BaseUrl = "https://api.keys.so/";
         private readonly string _userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:83.0) Gecko/20100101 Firefox/83.0 ";
         private static readonly object SyncGET = new object();
         private static readonly object SyncPOST = new object();
@@ -30,29 +30,31 @@ namespace ClassLibrary
 
         public async Task<string> GETAsync(string Uri)
         {
-            var requestMessage = new HttpRequestMessage(HttpMethod.Get, $"{BaseUrl + _token}/{Uri}");
+            //var requestMessage = new HttpRequestMessage(HttpMethod.Get, $"{BaseUrl + _token}/{Uri}");
+            
+            string url = $"{BaseUrl}/{Uri}&auth-token={_token}";//_token
+            HttpResponseMessage response = null;
             string error = string.Empty;
+            Task<string> content = null;
             _client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
             try
             {
-                var response = await _client.SendAsync(requestMessage);
-                response.StatusCode.ToString();
+                response = await _client.GetAsync(url);
+                if (response.IsSuccessStatusCode)
+                {
+                    content = response.Content.ReadAsStringAsync();
+                    Console.WriteLine(content.Result);
+                }
+                else
+                {
+                    Console.WriteLine(response.StatusCode + "\n" + content);
+                    throw new Exception(response.ReasonPhrase);
+                }
 
-
-                var content = response.Content.Headers;
+                //var content = response.Content.Headers;
                 Console.WriteLine(response.ToString());
 
-
-                //using (FileStream fs = new FileStream("Post.json", FileMode.OpenOrCreate))
-                //{
-                //    using (StreamWriter writer = new StreamWriter(@"C:\Users\user\source\repos\ConsoleAppHTTP\bin\Debug\net5.0\Post.json"))
-                //    {
-                //        JsonConvert.SerializeObject(content);
-                //        Console.WriteLine("Сериализация выполенена");
-
-                //    }
-                //}
-                return content.ToString();
+                return await response.Content.ReadAsStringAsync();
             }
             catch (Exception ex)
             {
@@ -64,10 +66,10 @@ namespace ClassLibrary
             }
             finally
             {
-                requestMessage.Dispose();
+                response.Dispose();
             }
 
-            return null;
+            return await content;
         }
 
         public async Task<string> POSTAsync(string Uri, string content)
